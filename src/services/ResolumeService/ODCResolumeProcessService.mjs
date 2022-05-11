@@ -156,7 +156,7 @@ class ODCResolumeProcessService extends ODCServiceInterface{
                         resolve(proc);
                     })
                     .then(proc => {
-                        this.pid = pid;
+                        this.pid = proc.pid;
                         this.state.status = PLAYBACK_STATUS.IDLE;
                         return proc;
                     })

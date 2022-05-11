@@ -27,5 +27,5 @@ No installer for now. But planned to be done.
 OpenDController is licensed under the GNU General Public License v3 (GPL-3) (http://www.gnu.org/copyleft/gpl.html).
 
 Interested in a sublicense agreement for use of OpenDController in a non-free/restrictive environment? 
-Contact me at [mail: <a-m.maurin@a2mSystemes.fr>](mailto://a-m.maurin@a2mSystemes.fr)
+Contact me at [<a-m.maurin@a2mSystemes.fr>](mailto://a-m.maurin@a2mSystemes.fr)
 
