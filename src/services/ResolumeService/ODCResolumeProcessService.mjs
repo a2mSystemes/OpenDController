@@ -1,4 +1,4 @@
-import path from "path";
+import path, { resolve } from "path";
 import { PLAYBACK_STATUS, SERVICE_TYPE } from "../../core/constants/ODCConstants.mjs";
 import ODCServiceFactoryInterface from "../../core/types/ODCServiceFactoryInterface.mjs";
 import ODCServiceInterface from "../../core/types/ODCServiceInterface.mjs";
@@ -6,6 +6,7 @@ import fs from 'fs';
 import { spawn } from "child_process";
 import find from 'find-process';
 import { sleep } from "../../core/utils/ODCUtils.mjs";
+import {tasklist} from 'tasklist';
 
 class ResolumeState{
     constructor(){
@@ -145,7 +146,22 @@ class ODCResolumeProcessService extends ODCServiceInterface{
     }
 
     async connect(){
-        return new Promise((resolveConnect, rejectConnect) => {
+        return new Promise(async (resolveConnect, rejectConnect) => {
+            //check if a resolume process is launched
+            await tasklist({  'filter': ['imagename eq Arena.exe']}).then(r => {
+                console.log('an instance of resolume is launched : ', r)
+                if(typeof r !== 'undefined' && r. length <= 0){
+                    console.log('not found');
+                }else{
+                    console.log('closing resolume instance(s)');
+                    for(const instance in r){
+                        console.log('pid to kill : ', r[instance].pid );
+                        this.disconnect(r[instance].pid);
+                    }
+                    return r;
+                }
+            }).catch(err => console.log(err));
+
                     var arena = 
                     new Promise( async (resolve, reject) => {
                         let proc = spawn(this.resolumePath, 
@@ -182,21 +198,15 @@ class ODCResolumeProcessService extends ODCServiceInterface{
         });
     }
 
-    async disconnect(){
-        process.kill(this.pid);
-        find('pid', this.pid).then((list) => {
-            if(list.length === 0){
-                this.connected = false;
-                this.pid = -1;
-                this.emit('disconnected', this.state);
-            }else{
-                this.emit('error', `could not close resolume process with pid ${this.pid}`);
-            }
-        }, (err) => {
-            // console.log(err);
-        });
+    async disconnect(pid=undefined){
+        let resolumePid;
+        if (pid ===undefined) {
+            resolumePid = this.pid
+        }else {
+            resolumePid = pid;
+        }
+        process.kill(resolumePid);
         await sleep(1000);
- 
     }
     restart(){
         this.emit(this.restart);

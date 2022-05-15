@@ -1,7 +1,6 @@
 import express from 'express';
-import loginRouter from "./routes/login.mjs";
 import path, { resolve } from 'path';
-
+import Artnet from 'artnet';
 //hack from https://github.com/nodejs/help/issues/2907 ************************************
 /*
  dcjayasuriya2020 commented on 10 Jan 2021
@@ -20,25 +19,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /******************************************************************************************* */
 
-// const app = express();
-// app.set('view engine', 'ejs');
-// app.set('views', path.join(__dirname, './views'))
-// app.use('/', loginRouter);
-
-// const PORT = process.env.PORT || 4111;
-
-// app.listen(PORT, console.log("Server don start for port: " + PORT))
 
 import { ODCResolumeProcessServiceFactory, ODCResolumeProcessService } from './services/ResolumeService/ODCResolumeProcessService.mjs';
 import { delayedCallGranular, delayedCall} from './core/utils/ODCUtils.mjs';
 import {createProxyMiddleware } from 'http-proxy-middleware'
 import cors from 'cors';
 import expressWs from 'express-ws';
-import Projector from './services/pjlink-service.mjs';
+import Projector from './services/ProjectorService/ODCPjlinkService.mjs';
+// import res from 'express/lib/response';
 
 
 const resolumeFactory = new ODCResolumeProcessServiceFactory();
 const resolumeService = resolumeFactory.create();
+
+const light = Artnet({host: '192.168.200.133'});
+
 
 
 
@@ -52,34 +47,17 @@ resolumeService.on('disconnected', (state) => {
     console.log(`disconnected_event IN SERVER.JS ${state}`)
 })
 
-const projectors = {
-    p101: new Projector('192.168.200.101', ''), 
-    p102: new Projector('192.168.200.102', ''), 
-    p103: new Projector('192.168.200.103', ''), 
-    p104: new Projector('192.168.200.104', ''), 
-    p105: new Projector('192.168.200.105', ''), 
-    p106: new Projector('192.168.200.106', ''), 
-};
-
-const options = {
-    target: 'http://localhost:6001', // target host
-    //changeOrigin: true, // needed for virtual hosted sites
-    // ws: true, // proxy websockets
+const resolumeProxy = createProxyMiddleware({
+    target: 'http://localhost:6001',
     pathRewrite: {
-      '^/resolume/': '/api/v1/', // rewrite path
+      '^/resolume/': '/api/v1/',
     },
+  });
 
-  };
-
-  // create the proxy (without context)
-const exampleProxy = createProxyMiddleware(options);
-
-// mount `exampleProxy` in web server
 const app = express();
 expressWs(app);
 
 
-app.use('/api', exampleProxy);
 
 const router = express.Router();
 router.ws('/compo', (ws, req) => {
@@ -98,39 +76,101 @@ router.ws('/compo', (ws, req) => {
                         compo: -1
                     };
                     resolumeService.getCompos().then( compos => {
-                        console.log(compos);
                         ret.files = compos;
-                        console.log('resolume started sending back ->' + JSON.stringify(ret));            
                         ws.status = 200;
                         ws.send(JSON.stringify(ret));
                         return;
-                    } ).then(
-                       Object.keys(projectors).forEach(key => {
-                            console.log('powering on ', key,);
-                            projectors[key].power('on');
-                        })
-                    );
-
-
+                    } );
                 }
             );
             break;
-
             case 'shutdown':
-                resolumeService.disconnect().then(
-                    Object.keys(projectors).forEach(key => {
-                        console.log('powering off ', key,);
-                        projectors[key].power('off');
-                    })
-                );
-
+                resolumeService.disconnect();
             break;
+            case 'open':
+                if(msg.project !== undefined) {
+                    resolumeService.getCompos().then( compos => {
+                        let index = compos.indexOf(msg.project)
+                        if(index <=0) {
+                            resolumeService.setSelected(index).then( (r) => {
+                                let ret = {   
+                                    running: true,
+                                    files: [],
+                                    command: '',
+                                    compo: index
+                                };
+                                ws.status = 200;
+                                ws.send(JSON.stringify(ret));
+                                return;
+                            });
 
+                        }
+                    })
+                    
+                }
+                
         }
     });
 });
 
-app.use('/process-ws', cors(), router);
+app.get('/projectors/:action',  cors(), (req, res) => {
+    console.log('projectorAPI');
+    const projectors = {
+        p101: new Projector('192.168.200.101', ''), 
+        p102: new Projector('192.168.200.102', ''), 
+        p103: new Projector('192.168.200.103', ''), 
+        p104: new Projector('192.168.200.104', ''), 
+        p105: new Projector('192.168.200.105', ''), 
+        p106: new Projector('192.168.200.106', ''), 
+    };
+    res.type('application/json');
+    switch (req.params.action){
+        case 'on':
+            Object.keys(projectors)
+                    .forEach(key => {
+                     console.log('powering on ');
+                     projectors[key].power('on');
+            });
+            res.status(200).send({message: 'OK', requested: req.params.action});
+            break;
+        case 'off':
+            Object.keys(projectors)
+                    .forEach(key => {
+                    console.log('powering off ');
+                    projectors[key].power('off');
+            });
+            res.status(200).send({message: 'OK', requested: req.params.action});
+            break;
+        default:
+            res.status(404).send({message: 'no action', requested: req.params.action});
+            break;
+    }
+});
 
+
+app.get('/light/:id/:action', cors(), (req, res) => {
+    
+    res.type('application/json');
+    switch(req.params.action){
+        case 'on':
+            light.set(1, 1, 255);
+            console.log('light on');
+            res.status(200).send({message: 'OK'});
+            break;
+        case 'off':
+            light.set(1, 1, 0);
+        console.log('light off');
+            res.status(200).send({message: 'OK'});
+            break;
+        default:
+            res.status(404).send({message: 'no action', requested: req.params.action});
+            break;
+    }
+
+});
+
+
+app.use('/process-ws', cors(), router);
+app.use('/api', resolumeProxy);
 
 app.listen(3000);
