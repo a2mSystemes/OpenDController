@@ -1,51 +1,54 @@
 {
-  "name": "open-device-controller",
-  "version": "0.1.0",
-  "description": "Lightweight audiovisual control system",
-  "main": "server.js",
-  "type": "module",
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
-  "scripts": {
-    "start": "nodemon src/server.mjs",
-    "test": "ava"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/a2msystemes/OpenDController.git"
-  },
-  "author": "Ange-Marie MAURIN",
-  "license": "GPL-3.0-only",
-  "bugs": {
-    "url": "https://github.com/a2msystemes/OpenDController/issues"
-  },
-  "homepage": "https://github.com/a2msystemes/OpenDController#readme",
-  "dependencies": {
-    "artnet": "^1.4.0",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "ejs": "^3.1.6",
-    "express": "^4.17.3",
-    "express-ws": "^5.0.2",
-    "find-process": "^1.4.7",
-    "http-proxy-middleware": "^2.0.6",
-    "passport": "^0.5.2",
-    "passport-local": "^1.0.0",
-    "tasklist": "^5.0.0",
-    "yarn": "^1.22.18"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.17.9",
-    "@babel/plugin-transform-modules-commonjs": "^7.17.9",
-    "@babel/preset-env": "^7.16.11",
-    "ava": "^4.2.0",
-    "babel-jest": "^27.5.1",
-    "jest": "^27.5.1",
-    "nodemon": "^2.0.15",
-    "npm-clean": "^1.0.3",
-    "ts-jest": "^27.1.4"
-  }
+    "name": "open-device-controller",
+    "version": "0.1.0",
+    "description": "Lightweight audiovisual control system",
+    "main": "server.js",
+    "type": "module",
+    "directories": {
+        "doc": "docs",
+        "test": "test"
+    },
+    "scripts": {
+        "start": "nodemon -e ini,mjs,js --watch config/* --watch src/* src/server.mjs",
+        "process-service": "nodemon -e ini,mjs,js --watch config/* --watch src/* src/serverProcess.mjs",
+        "test": "ava"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/a2msystemes/OpenDController.git"
+    },
+    "author": "Ange-Marie MAURIN",
+    "license": "GPL-3.0-only",
+    "bugs": {
+        "url": "https://github.com/a2msystemes/OpenDController/issues"
+    },
+    "homepage": "https://github.com/a2msystemes/OpenDController#readme",
+    "dependencies": {
+        "artnet": "^1.4.0",
+        "babel-plugin-transform-async-to-generator": "^6.24.1",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "ejs": "^3.1.6",
+        "express": "^4.17.3",
+        "express-ws": "^5.0.2",
+        "find-process": "^1.4.7",
+        "http-proxy-middleware": "^2.0.6",
+        "js-ini": "^1.5.1",
+        "passport": "^0.5.2",
+        "passport-local": "^1.0.0",
+        "rxjs": "^7.5.5",
+        "tasklist": "^5.0.0",
+        "yarn": "^1.22.18"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.17.9",
+        "@babel/plugin-transform-modules-commonjs": "^7.17.9",
+        "@babel/preset-env": "^7.16.11",
+        "ava": "^4.2.0",
+        "babel-jest": "^27.5.1",
+        "jest": "^27.5.1",
+        "nodemon": "^2.0.15",
+        "npm-clean": "^1.0.3",
+        "ts-jest": "^27.1.4"
+    }
 }

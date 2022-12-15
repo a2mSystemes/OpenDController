@@ -3672,6 +3672,11 @@
     "import-local" "^3.0.2"
     "jest-cli" "^27.5.1"
 
+"js-ini@^1.5.1":
+  "integrity" "sha512-jvSZb1TcYFOPZIB+HHNBu5xKUF/87iOX+EBQxN5obUfEMtBE4k/z73v3LLVSVtv3PtBAh34bTNBt/KGtFZ5EaQ=="
+  "resolved" "https://registry.npmjs.org/js-ini/-/js-ini-1.5.1.tgz"
+  "version" "1.5.1"
+
 "js-string-escape@^1.0.1":
   "integrity" "sha1-4mJbrbwNZ8dTPp7cEGjFh65BN+8="
   "resolved" "https://registry.npmjs.org/js-string-escape/-/js-string-escape-1.0.1.tgz"
@@ -4580,6 +4585,13 @@
   dependencies:
     "queue-microtask" "^1.2.2"
 
+"rxjs@^7.5.5":
+  "integrity" "sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw=="
+  "resolved" "https://registry.npmjs.org/rxjs/-/rxjs-7.5.5.tgz"
+  "version" "7.5.5"
+  dependencies:
+    "tslib" "^2.1.0"
+
 "safe-buffer@~5.1.1":
   "integrity" "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g=="
   "resolved" "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
@@ -5034,6 +5046,11 @@
     "make-error" "1.x"
     "semver" "7.x"
     "yargs-parser" "20.x"
+
+"tslib@^2.1.0":
+  "integrity" "sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ=="
+  "resolved" "https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz"
+  "version" "2.4.0"
 
 "type-check@~0.3.2":
   "integrity" "sha1-WITKtRLPHTVeP7eE8wgEsrUg23I="
