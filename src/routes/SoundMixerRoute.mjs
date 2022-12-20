@@ -14,18 +14,27 @@ router.use((req, res, next) => {
 
 
 
-router.get('/', cors(), (req, res) => {
+router.get('/state', cors(), (req, res) => {
+    let r = { from: 'SoundMixerRoute', command: 'state', value: true, device: 'Extron® SSP 200', done: false };
+    // TODO: handle disconnected
     service.state().then((state) => {
-        res.status(200).json({ message: 'OK', state: state });
+        r.done = true;
+        r.response = state;
+        res.status(200).json(r);
     });
 });
 
-router.get('/input/:input', cors(), (req, res) => {
+router.get('/input/select/:input', cors(), (req, res) => {
+    // TODO: protect input data and convert to number
     let input = req.params.input;
+    let r = { from: 'SoundMixerRoute', command: 'mute', value: `${input}`, device: 'Extron® SSP 200', done: false };
     service.setInput(input).then((state) => {
-        res.status(200).json({ message: 'DONE', state: state });
+        r.response = state;
+        res.done = true;
+        res.status(200).json(r);
     }).catch(err =>{
-        res.status(501).json({ message: 'ERROR SWITCHING INPUT ', error : err });
+        r.response = err;
+        res.status(501).json(r);
     });
  
 });
@@ -33,43 +42,64 @@ router.get('/input/:input', cors(), (req, res) => {
 
 
 router.get('/volume/mute', cors(), (req, res) => {
+    let r = { from: 'SoundMixerRoute', command: 'mute', value: true, device: 'Extron® SSP 200', done: false };
     service.mute().then((state) => {
-        res.status(200).json({ message: 'DONE', state: state });
+        r.response = state;
+        r.done = true;
+        res.status(200).json(SoundMixerRoute);
     }).catch(err => {
-        res.status(501).json({ message: 'ERROR MUTE ', error : err });
+        r.response = err;
+        res.status(501).json(r);
     });
 });
 
 router.get('/volume/unmute', cors(), (req, res) => {
+    let r = { from: 'SoundMixerRoute', command: 'mute', value: true, device: 'Extron® SSP 200', done: false };
     service.unmute().then((state) => {
-        res.status(200).json({ message: 'DONE', state: state });
+        r.response = state;
+        r.done = true;
+        res.status(200).json(r);
     }).catch(err => {
-        res.status(501).json({ message: 'ERROR UN-MUTE ', error : err });
+        r.response = err
+        res.status(501).json(r);
     });
 });
 
 router.get('/volume/up', cors(), (req, res) => {
+    let r = { from: 'SoundMixerRoute', command: 'mute', value: true, device: 'Extron® SSP 200', done: false };
     service.volumeUp().then((state) => {
-        res.status(200).json({ message: 'DONE', state: state });
+        r.done = true;
+        r.response = state
+        res.status(200).json(r);
     }).catch(err => {
-        res.status(501).json({ message: 'ERROR VOLUME UP ', error : err });
+        r.response = err;
+        res.status(501).json(r);
     });
 });
 
 router.get('/volume/down', cors(), (req, res) => {
+    let r = { from: 'SoundMixerRoute', command: 'mute', value: true, device: 'Extron® SSP 200', done: false };
+
     service.volumeDown().then((state) => {
-        res.status(200).json({ message: 'DONE', state: state });
+        r.done = true;
+        r.response = state;
+        res.status(200).json(r);
     }).catch(err => {
-        res.status(501).json({ message: 'ERROR VOLUME DOWN ', error : err });
+        r.response = err;
+        res.status(501).json(r);
     });
 });
 
 router.get('/volume/:volume', cors(), (req, res) => {
-    let volume = Number(req.params.volume);
+    let r = { from: 'SoundMixerRoute', command: 'mute', value: true, device: 'Extron® SSP 200', done: false };
+    const volume = Number(req.params.volume);
     service.setVolume(volume).then((state) => {
-        res.status(200).json({ message: 'DONE', state: state });
+        r.done = true;
+        r.response = state;
+        res.status(200).json(r);
     }).catch(err => {
-        res.status(501).json({ message: 'ERROR VOLUME SET ', error : err });
+        r.response = err
+        res.status(501).json(r);
     });
 });
 

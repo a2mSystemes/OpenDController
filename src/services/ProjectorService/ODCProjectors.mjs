@@ -2,15 +2,12 @@ import Projector from "./ODCPjlinkService.mjs";
 
 export default class Projectors{
 
-    _projectors = new Array();
+    _projectors = [];
 
     constructor(config) {
-        console.log('construct projectors with ', config);
-        let projectors = config;
-        projectors.forEach(proj => {
-            console.log(proj);
-            this.addProjector(proj);
-             });
+        for (let ip of config){
+            this.addProjector(ip);
+        }
     };
 
     addProjector(ip){
@@ -20,11 +17,10 @@ export default class Projectors{
     getPower(projId){
         if(projId !== undefined && projId > 0 && projId <= this._projectors.length){
             projId--;
-            console.log('projId = ', projId);
+            // console.log('projId = ', projId);
         }
         else{
-            console.log('Projector ID does not exists');
-            return new Promise((resolve, reject) => reject({error : 'Projector ID does not exists ' + projId}));
+            throw new Error('Projector ID does not exists ' + projId);
         }
         return this._projectors[projId].getPower();
     }
@@ -32,11 +28,10 @@ export default class Projectors{
     powerOn(projId){
         if(projId !== undefined && projId > 0 && projId <= this._projectors.length){
             projId--;
-            console.log('projId = ', projId);
+            // console.log('projId = ', projId);
         }
         else{
-            console.log('Projector ID does not exists');
-            return new Promise((resolve, reject) => reject({error : 'Projector ID does not exists ' + projId}));
+            throw new Error('Projector ID does not exists ' + projId);
         }
         return this._projectors[projId].power('on')
     }
@@ -44,16 +39,15 @@ export default class Projectors{
     powerOff(projId){
         if(projId !== undefined && projId > 0 && projId <= this._projectors.length){
             projId--;
-            console.log('projId = ', projId);
+            // console.log('projId = ', projId);
         }
         else{
-            console.log('Projector ID does not exists');
-            return new Promise((resolve, reject) => reject({error : 'Projector ID does not exists ' + projId}));
+            throw new Error('Projector ID does not exists ' + projId);
         }
         return this._projectors[projId].power('off')
     }
 
-    allOn(){
+    async allOn(){
         this._projectors.forEach((proj) => proj.power('on') );
         return new Promise((resolve, reject) =>{
             resolve({Message : 'ALL ON OK'})
@@ -61,7 +55,7 @@ export default class Projectors{
         );
     }
 
-    allOff(){
+    async allOff(){
         this._projectors.forEach((proj) => proj.power('off') );
         return new Promise((resolve, reject) =>{
             resolve({Message : 'ALL OFF OK'})
@@ -69,29 +63,27 @@ export default class Projectors{
         );
     }
 
-    getInput(projId){
+    async getInput(projId){
         if(projId !== undefined && projId > 0 && projId <= this._projectors.length){
             projId--;
-            console.log('projId = ', projId);
+            // console.log('projId = ', projId);
         }
         else{
-            console.log('Projector ID does not exists');
-            return new Promise((resolve, reject) => reject({error : 'Projector ID does not exists ' + projId}));
+            throw new Error('Projector ID does not exists ' + projId);
         }
         return this._projectors[projId].getInput();
     }
 
-    setInput(projId, input){
+    async setInput(projId, input){
         if(projId !== undefined && projId > 0 && projId <= this._projectors.length){
             projId--;
-            console.log('projId = ', projId);
+            // console.log('projId = ', projId);
         }
         else{
-            console.log('Projector ID does not exists');
-            return new Promise((resolve, reject) => reject({error : 'Projector ID does not exists ' + projId}));
+            throw new Error('Projector ID does not exists ' + projId);
         }
         let inpt = input.toLowerCase();
-        console.log('inpt = ', inpt);
+        // console.log('inpt = ', inpt);
             switch (inpt) {
                 case 'video':
                 case 'pal':

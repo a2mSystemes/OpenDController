@@ -14,13 +14,9 @@ let projector = null;
 
 router.use((req, res, next) => {
     projector = req.app.get('projector');
-    console.log('projector selected ', projector);
     config = req.app.get('config');
     let manager = req.app.get('ServiceManager');
-    // manager.listServices();
     service = manager.getService('ProjectorsService');
-    // console.log('service Manager ', req.app.get('serviceManager'));
-    // console.log('ProjectorService ', service);
     next();
 });
 
@@ -70,7 +66,7 @@ router.get('/input', cors(), (req, res) => {
 
 router.get('/input/select/:input', cors(), (req, res) => {
     let inpt = req.params.input;
-
+    // 'HDMI1' | 'HDMI2' | 'VGA' | 'VIDEO' case insensitive
     service.setInput(projector, inpt).then(() => {
         console.log('success');
         res.status(200).json({ message: 'SUCCESS', inputState: inpt })

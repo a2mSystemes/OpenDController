@@ -7,8 +7,7 @@ export default class ODCServiceManager{
     }
 
     addService(name, service){
-        if(service === 'Projector')
-            console.log(service.getUrl());
+        // console.log(`adding service ${name} with object ${service}`);
         this.services[name] = service;
     }
 
@@ -20,10 +19,14 @@ export default class ODCServiceManager{
     }
 
     listServices(){
-        for(var service in this.services){
+        for(let service in this.services){
             console.log(service, ' :');
             console.log(this.services[service]);
         }
+    }
+
+    getServices(){
+        return this.services;
     }
 }
 

@@ -14,7 +14,7 @@ router.use((req, res, next) => {
 
 
 
-router.get('/:channel/on', cors(), (req, res) => {
+router.get('/channel/:channel/on', cors(), (req, res) => {
     let channel =   Number(req.params.channel);
     if(isNaN(Number(req.params.channel)))
         return res.status(500).json({error: req.params.channel + ' is not a number'});
@@ -27,7 +27,7 @@ router.get('/:channel/on', cors(), (req, res) => {
                 res.status(500).json(err));
 });
 
-router.get('/:channel/off', cors(), (req, res) => {
+router.get('/channel/:channel/off', cors(), (req, res) => {
     let channel =   Number(req.params.channel);
     if(isNaN(Number(req.params.channel)))
         return res.status(500).json({error: req.params.channel + ' is not a number'});

@@ -1,10 +1,8 @@
 import net from 'net';
 import crypto from 'crypto';
-import { rejects } from 'assert';
-import { resolve } from 'path';
+
 
 const maxRetries = 5;
-let iii = 0;
 
 // PJLINK commands
 
@@ -124,7 +122,7 @@ export default class Projector {
 
 
     async _sendCmd(cmd, arg, retry, err) {
-        if (cmd == 'INPT') console.log(cmd + ' ' + arg);
+        // if (cmd == 'INPT') console.log(cmd + ' ' + arg);
         if (!retry) retry = 0;
         return new Promise(async(res, rej) => {
             if (retry > maxRetries) {
@@ -256,7 +254,7 @@ export default class Projector {
         return new Promise((res, rej) => {
             this._sendCmd('INPT', '?')
                 .then((rtn) => {
-                    console.log('received in get ' + rtn);
+                    // console.log('received in get ' + rtn);
                     switch (rtn.slice(0, 1)) {
                         case '1':
                             res('RGB ' + rtn.slice(1, 2));
@@ -302,7 +300,7 @@ export default class Projector {
                 break;
         }
         return new Promise((res, rej) => {
-            console.log('about to change input to ' + type + ' ' + inpt);
+            // console.log('about to change input to ' + type + ' ' + inpt);
             this._sendCmd('INPT', inpt)
                 .then( () => this.getInput()
                 .then( (input) => res(input) ) )
