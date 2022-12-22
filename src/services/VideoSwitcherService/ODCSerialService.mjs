@@ -135,24 +135,23 @@ export default class ODCSerialService {
         vendorId = String(vendorId);
         productId = String(productId);
         if (vendorId && productId) {
-            // console.log("Scanning with : ", vendorId, " ", productId);
             let path = undefined;
-            const ports = await SerialPort.list();
-            for (let port of ports) {
-                // console.log(port);
-                if (port.vendorId === vendorId && port.productId === productId) {
-                    path = port.path;
+            const ports = await SerialPort.list().then((ports) => {
+                for (let port of ports) {
+                    if (port.vendorId === vendorId && port.productId === productId ) {
+                        path = port.path;
+                    }
                 }
-            }
-            if (path === undefined) {
-                throw new Error(`Unable to find device with ${vendorId} and ${productId}`);
-            }
-            // console.log('return object');
-            return new Promise((r) => {
-                const service = new ODCSerialService(baudRate, path);
-                // console.log(service);
-                r(service);
+                if (path === undefined) {
+                    throw new Error(`Unable to find device with ${vendorId} and ${productId}`);
+                }
+                return new Promise((r) => {
+                    const service = new ODCSerialService(baudRate, path);
+                    console.log(service);
+                    r(service);
+                }); 
             });
+            
         }
         else {
             throw new Error(`bad options: baudRate:'${baudRate}' vendorId='${vendorId}' productId='${productId}'`);

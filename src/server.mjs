@@ -19,8 +19,6 @@ const __filename = fileURLToPath(
 const __dirname = path.dirname(__filename);
 /******************************************************************************************* */
 
-import { ODCResolumeProcessServiceFactory, ODCResolumeProcessService } from './services/ResolumeService/ODCResolumeProcessService.mjs';
-import { delayedCallGranular, delayedCall } from './core/utils/ODCUtils.mjs';
 import cors from 'cors';
 // import expressWs from 'express-ws';
 // import Projector from './services/ProjectorService/ODCPjlinkService.mjs';
@@ -49,30 +47,29 @@ const setup = () => {
 
     const serviceManager = new ODCServiceManager();
     let config = await fs.readFile('config/OpenDController.server.ini', 'utf-8').then((cfgTxt) => {
-        // console.log('config ready');
         return parse(cfgTxt, { dataSections: ['MappingProjectors'] });
     });
     //*** NOT USED
     // const mdns = new Bonjour()
     // mdns.publish({ name: 'opendDControllerServer', subtypes: ['config', 'api'], txt: 'config avialable at /config', type: 'http', port: 3000, host: config.DevicesService.ip })
     //*** */
-    let hdmiMatrixService;
-    await ODCSerialService.createAsync(config.HdmiMatrix.baudRate, config.HdmiMatrix.vendorId, config.HdmiMatrix.productId).then((service) => {
-        hdmiMatrixService = service;
-        // console.log(`creation of hdmiMatrixService`);
-    });
-    const projectorService = new Projectors(config.MappingProjectors);
-    const soundMixerService = new SSP200(config.SoundMixer.pass, config.SoundMixer.ip, config.SoundMixer.port, config.SoundMixer.heartbeat)
-    const lightService = new ArtnetLight(config.ArtNetDevice.ip, config.ArtNetDevice.port);
-    serviceManager.addService('ProjectorsService', projectorService);
-    serviceManager.addService('SoundMixerService', soundMixerService);
-    serviceManager.addService('LightService', lightService);
-    serviceManager.addService('SwitcherService', hdmiMatrixService);
+    if(config.HdmiMatrix.activate){
+        serviceManager.addService('SwitcherService', new ODCSerialService(config.HdmiMatrix.baudRate, config.HdmiMatrix.path));
+    }
 
+        const projectorService = new Projectors(config.MappingProjectors);
+        const soundMixerService = new SSP200(config.SoundMixer.pass, config.SoundMixer.ip, config.SoundMixer.port, config.SoundMixer.heartbeat)
+        console.log(config.ArtNetDevice.ip);
+        const lightService = new ArtnetLight(config.ArtNetDevice.ip, 
+            config.ArtNetDevice.port);
+        serviceManager.addService('ProjectorsService', projectorService);
+        serviceManager.addService('SoundMixerService', soundMixerService);
+        serviceManager.addService('LightService', lightService);
+
+
+    
     app.set('config', config);
     app.set('ServiceManager', serviceManager);
-
-
 
     app.use('/config', cors(), ConfigRoute);
     app.use('/projector/:projector',
@@ -80,9 +77,35 @@ const setup = () => {
             req.app.set('projector', req.params.projector);
             next();
     },cors(),ProjectorRoute);
-    app.use('/sound-mixer', cors(), SoundMixerRoute);
-    app.use('/video-switcher', cors(), VideoSwitcherRoute);
+    app.use('/audio-mixer', cors(), SoundMixerRoute);
+    app.use('/video-switcher',(req, res, next) => {
+        if(config.HdmiMatrix.activate){
+            next();
+        }else{
+            let r = { from: 'VideoSwitcherRoute', 
+                        command: 'switch/video', 
+                        value: config.HdmiMatrix.activate, 
+                        device:'purelink HDMI UHDS-41R Switcher', 
+                        done: false,
+                        response: 'Desactivated by your administrator' };
+            res.status(200).json(r);
+        }
+    }, cors(), VideoSwitcherRoute);
     app.use('/light', cors(), LightsRoute);
+    if(!config.misc.prod){
+        console.log(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-grid.min.css"));
+        console.log(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-reboot.min.css"));
+
+        // app.use("/styles/css/bootstrap-grid", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-grid.css")));
+        // app.use("/styles/css/bootstrap-grid.css.map", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-grid.css.map")));
+        // app.use("/styles/css/bootstrap-reboot.css.map", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-reboot.css.map")));
+        // app.use("/styles/css/bootstrap-reboot", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-reboot.css")));
+        app.use("/styles/css/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/")));
+        app.use("/js/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/js/")));
+        app.get('/', (req, res, next) => {
+            return res.sendFile(path.join(__dirname, 'static', 'dev.html'))
+        });
+    }
     // console.log('leaving setup');
     resolve(config);
 });
@@ -94,6 +117,3 @@ setup().then( ((config) => {
         console.log('listening on http://' + config.DevicesService.ip + ':' + config.DevicesService.port);
     });
 }))
-
-
-

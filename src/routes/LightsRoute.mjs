@@ -20,7 +20,6 @@ router.get('/channel/:channel/on', cors(), (req, res) => {
         return res.status(500).json({error: req.params.channel + ' is not a number'});
     service.on(channel)
         .then((r) => {
-                console.log('response : ', r); 
                 res.status(200).json(r)
             })
         .catch((err) => 
@@ -33,7 +32,6 @@ router.get('/channel/:channel/off', cors(), (req, res) => {
         return res.status(500).json({error: req.params.channel + ' is not a number'});
     service.off(channel)
         .then((r) => {
-                console.log('response : ', r); 
                 res.status(200).json(r)
             })
         .catch((err) => 
@@ -45,8 +43,7 @@ router.get('/universe/:universe/channel/:channel/value/:value', cors(), (req, re
     let value = req.params.value;
     let channel = req.params.channel;
     service.send(universe, channel, value)
-        .then((r) =>
-            {console.log('response : ', r); 
+        .then((r) => {
             res.status(200).json(r)})
         .catch((err) => 
             res.status(500).json(err));

@@ -9,7 +9,8 @@
         "test": "test"
     },
     "scripts": {
-        "start": "nodemon -e ini,mjs,js --watch config/* --watch src/* src/server.mjs",
+        "start-debug": "nodemon -e ini,mjs,js --watch config/* --watch src/* src/server.mjs",
+        "start": "node src/server.mjs",
         "process-service": "nodemon -e ini,mjs,js --watch config/* --watch src/* src/serverProcess.mjs",
         "test": "ava",
         "serial": "node src/serial.mjs"
@@ -30,6 +31,8 @@
         "bcryptjs": "^2.4.3",
         "bonjour": "^3.5.0",
         "bonjour-service": "^1.0.14",
+        "bootstrap": "^5.2.3",
+        "core-js": "^3.26.1",
         "cors": "^2.8.5",
         "ejs": "^3.1.6",
         "express": "^4.17.3",
@@ -39,7 +42,9 @@
         "js-ini": "^1.5.1",
         "passport": "^0.5.2",
         "passport-local": "^1.0.0",
+        "pjlink-control": "^1.0.2",
         "rxjs": "^7.5.5",
+        "rxjs-socket.io": "^0.3.9",
         "serialport": "^10.5.0",
         "tasklist": "^5.0.0",
         "yarn": "^1.22.18"

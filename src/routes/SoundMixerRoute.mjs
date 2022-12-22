@@ -34,7 +34,7 @@ router.get('/input/select/:input', cors(), (req, res) => {
         res.status(200).json(r);
     }).catch(err =>{
         r.response = err;
-        res.status(501).json(r);
+        res.status(500).json(r);
     });
  
 });
@@ -46,10 +46,11 @@ router.get('/volume/mute', cors(), (req, res) => {
     service.mute().then((state) => {
         r.response = state;
         r.done = true;
-        res.status(200).json(SoundMixerRoute);
+        res.status(200).json(r);
     }).catch(err => {
+        console.log(err);
         r.response = err;
-        res.status(501).json(r);
+        res.status(500).json(r);
     });
 });
 

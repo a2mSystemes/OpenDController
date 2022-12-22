@@ -118,7 +118,6 @@ OpenDController Server |
 │                          │     │                 
 │                          │     └ = {soundMixerState}                 
 │                          │         /* :action => global mute                
-│                          │         /* @returns the current global state of the switcher                  
 │                          │                       
 │                          └ /unmute
 │                          │       │                 
@@ -147,7 +146,7 @@ OpenDController Server |
 │                                       
 └───+ /video-switcher
                    │ 
-                   └ /switch/video/:in
+                   └ /input/select/:in
                    │                 │
                    │                 └ = {videoSwitcherState}
                    │                     /* @param => :in: HDMI input [1-4]   
@@ -155,32 +154,32 @@ OpenDController Server |
                    │                     /* @returns => object that confirm or not that  
                    │                     /*         the command has been executed correctly
                    │                     
-                   └ /switch/audio/:edid
+                   └ /edid/select/:edid
                    │                 │
                    │                 └ = {videoSwitcherState}
                    │                     /* @param => :edid: audio EDID mode [1-4]   
                    │                     /* :action => switch selected :edid: EDID. [mode 1 : auto]  
                    │                     /*    [ edid1 : 'auto', edid2 : 'Stereo Audio 2.0' 
-                   │                     /*      edid3 : 'Dolby/DTS 5.1', edid4 : 'HD Audio 7.1 ]  
+                   │                     /*      edid3 : 'Dolby/DTS 5.1', edid4 : 'HD Audio 7.1' ]  
                    │                     /* @returns => object that confirm or not that  
                    │                     /*         the command has been executed correctly
                    │                     
                    └ /query
                    │      │ 
-                   │      └ /in/:in
+                   │      └ /input/:in
+                   │      │          │
+                   │      │          └ = {videoSwitcherState}
+                   │      │                 /* @param => :in: HDMI input [1-4]   
+                   │      │                 /* :action => void  
+                   │      │                 /* @returns => object containing the connection status  
+                   │      │                 /*        of the selected input (Connected || Disconnected)
+                   │      │              
+                   │      └ /output              
                    │      │       │
                    │      │       └ = {videoSwitcherState}
-                   │      │              /* @param => :in: HDMI input [1-4]   
-                   │      │              /* :action => void  
-                   │      │              /* @returns => object containing the connection status  
-                   │      │              /*         of the selected input (Connected || Disconnected)
-                   │      │              
-                   │      └ /out              
-                   │      │    │
-                   │      │    └ = {videoSwitcherState}
-                   │      │              /* :action => void  
-                   │      │              /* @returns => object containing the connection status 
-                   │      │              /*         of the output (Connected || Disconnected)
+                   │      │                 /* :action => void  
+                   │      │                 /* @returns => object containing the connection status 
+                   │      │                 /*         of the output (Connected || Disconnected)
                    │      │              
                    │      └ /tmds
                    │      │    │
@@ -189,44 +188,43 @@ OpenDController Server |
                    │      │              /* @returns => object containing TMDS status  
                    │      │              
                    │      └ /help              
-                   │      │    │
-                   │      │    └ = {videoSwitcherState}
-                   │      │              /* :action => void  
-                   │      │              /* @returns => list of available commands  
+                   │           │
+                   │           └ = {videoSwitcherState}
+                   │                     /* :action => void  
+                   │                     /* @returns => list of available commands  
                    │ 
                    └ /autoswitch
-                                │
-                                └ /on 
-                                │   │
-                                │   └ = {videoSwitcherState}
-                                │       /* :action => set autoswitching video mode  
-                                │       /* @returns => object that confirm or not that  
-                                │       /*         the command has been executed correctly
-                                │
-                                └ /off 
-                                │    │
-                                │    └ = {videoSwitcherState}
-                                │        /* :action => unset autoswitching video mode 
-                                │        /* @returns => object that confirm or not that  
-                                │        /*         the command has been executed correctly
-                                │ 
-                   │ 
-                   └ /arc
-                                │
-                                └ /on 
-                                │   │
-                                │   └ = {videoSwitcherState}
-                                │       /* :action => set AudioReturnChannel (ARC)  
-                                │       /* @returns => object that confirm or not that  
-                                │       /*         the command has been executed correctly
-                                │
-                                └ /off 
-                                │    │
-                                │    └ = {videoSwitcherState}
-                                │        /* :action => unset AudioReturnChannel (ARC) 
-                                │        /* @returns => object that confirm or not that  
-                                │        /*         the command has been executed correctly
-                                │ 
+                   │           │
+                   │           └ /on 
+                   │           │   │
+                   │           │   └ = {videoSwitcherState}
+                   │           │       /* :action => set autoswitching video mode  
+                   │           │       /* @returns => object that confirm or not that  
+                   │           │       /*         the command has been executed correctly
+                   │           │
+                   │           └ /off 
+                   │                │
+                   │                └ = {videoSwitcherState}
+                   │                    /* :action => unset autoswitching video mode 
+                   │                    /* @returns => object that confirm or not that  
+                   │                    /*         the command has been executed correctly
+                   │               
+                   └ /arc     
+                        │
+                        └ /on 
+                        │   │
+                        │   └ = {videoSwitcherState}
+                        │       /* :action => set AudioReturnChannel (ARC)  
+                        │       /* @returns => object that confirm or not that  
+                        │       /*         the command has been executed correctly
+                        │
+                        └ /off 
+                             │
+                             └ = {videoSwitcherState}
+                                 /* :action => unset AudioReturnChannel (ARC) 
+                                 /* @returns => object that confirm or not that  
+                                 /*         the command has been executed correctly
+                                   
                                       
                                       
                                          

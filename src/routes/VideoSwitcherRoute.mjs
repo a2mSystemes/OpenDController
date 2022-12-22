@@ -15,9 +15,9 @@ router.use((req, res, next) => {
 });
 
 
-router.get('/switch/video/:in', (req, res) => {
+router.get('/input/select/:in', (req, res) => {
     const inpt = Number(req.params.in);
-    let r = { from: 'VideoSwitcherRoute', command: 'autoswitch/on', 
+    let r = { from: 'VideoSwitcherRoute', command: 'switch/video', 
         value: req.params.in, device:'purelink HDMI UHDS-41R Switcher', done: false };
     if (inpt !== NaN && inpt >= 1 && inpt < 5) {
         service.selectVideoInput(inpt)
@@ -49,7 +49,7 @@ router.get('/switch/video/:in', (req, res) => {
     }
 });
 
-router.get('/switch/audio/:edid', (req, res) => {
+router.get('/edid/select/:edid', (req, res) => {
     const inpt = Number(req.params.edid);
     let r = { from: 'VideoSwitcherRoute', command: 'autoswitch/on', 
         value: req.params.edid, device:'purelink HDMI UHDS-41R Switcher', done: false };
