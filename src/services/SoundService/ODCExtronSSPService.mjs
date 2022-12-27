@@ -32,8 +32,9 @@ export default class SSP200 {
     _sock = null;
     _heartbeat = null;
     _current_state = new AudioMixerState();
+    _heartbeat_i = null;
 
-    constructor(pass = "extron", ip = "192.168.200.254", port = 23, heartbeat = 0.5) {
+    constructor(pass = "extron", ip = "192.168.254.254", port = 23, heartbeat = 0.5) {
         this._pass = pass;
         this._ip = ip;
         this._port = port;
@@ -41,7 +42,6 @@ export default class SSP200 {
         this._sock = new net.Socket();
         this._sock.on('data', (buffer) => {
             this.parseResponse(buffer);
-
         });
         this._sock.on('error', (error) => { console.log(error); });
         this._sock.on('close', (data) => {
@@ -52,7 +52,7 @@ export default class SSP200 {
             console.log('connected');
         });
         this._sock.connect(this._port, this._ip);
-        setInterval(() => {
+        this._heartbeat_i = setInterval(() => {
             // console.log('hearbeat');
             this.update();
         }, this._heartbeat * 1000)

@@ -93,20 +93,12 @@ const setup = () => {
     }, cors(), VideoSwitcherRoute);
     app.use('/light', cors(), LightsRoute);
     if(!config.misc.prod){
-        console.log(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-grid.min.css"));
-        console.log(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-reboot.min.css"));
-
-        // app.use("/styles/css/bootstrap-grid", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-grid.css")));
-        // app.use("/styles/css/bootstrap-grid.css.map", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-grid.css.map")));
-        // app.use("/styles/css/bootstrap-reboot.css.map", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-reboot.css.map")));
-        // app.use("/styles/css/bootstrap-reboot", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/bootstrap-reboot.css")));
         app.use("/styles/css/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/")));
         app.use("/js/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/js/")));
         app.get('/', (req, res, next) => {
             return res.sendFile(path.join(__dirname, 'static', 'dev.html'))
         });
     }
-    // console.log('leaving setup');
     resolve(config);
 });
 } 

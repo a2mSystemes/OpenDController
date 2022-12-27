@@ -137,12 +137,13 @@ export default class Projector {
 
             socket.on('data', (buf) => {
                 // console.log('about to send data ' + buf.slice().toString());
-                if (buf.slice(0, 8).toString() == 'pjlink 0') {
+                if (buf.slice(0, 8).toString().toUpperCase() == 'PJLINK 0') {
                     socket.write(Buffer.from('%1' + cmd + ' ' + argString + '\r'));
                 } else {
                     ending = true;
                     this._killSocket(socket)
                         .then(() => {
+                            // console.log(`received ${buf.toString()}`);
                             if (buf.slice(0, 7).toString() == '%1' + cmd + '=') {
                                 if (!query) {
                                     if (buf.slice(7, 9).toString() == 'OK') {
