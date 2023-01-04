@@ -33,6 +33,7 @@ export default class SSP200 {
     _heartbeat = null;
     _current_state = new AudioMixerState();
     _heartbeat_i = null;
+    _connected = false;
 
     constructor(pass = "extron", ip = "192.168.254.254", port = 23, heartbeat = 0.5) {
         this._pass = pass;
@@ -43,24 +44,55 @@ export default class SSP200 {
         this._sock.on('data', (buffer) => {
             this.parseResponse(buffer);
         });
-        this._sock.on('error', (error) => { console.log(error); });
+        this._sock.on('error', (error) => { 
+            console.log("Connection lost",  error); 
+        });
+        this._sock.on('timeout', () =>  {
+            console.log('reconnecting on timeout');
+            this.reconnect();
+        });
         this._sock.on('close', (data) => {
-            console.log(data);
+            console.log('reconnecting on timeout');
+            this.reconnect();
         });
         // password is required
         this._sock.on('connect', (buffer) => {
             console.log('connected');
+            this._connected = true;
+            clearInterval(this._recon_i);
+            this._heartbeat_i = setInterval(() => {
+                // console.log('hearbeat');
+                this.update();
+            }, this._heartbeat * 1000)
         });
-        this._sock.connect(this._port, this._ip);
-        this._heartbeat_i = setInterval(() => {
-            // console.log('hearbeat');
-            this.update();
-        }, this._heartbeat * 1000)
+
+        this._recon_i = this.interval_reconnect();
     }
 
+    reconnect(){
+        this.remove_listeners();
+        this._connected = false;
+        return this.interval_reconnect();
+    }
+
+    interval_reconnect(){
+        return setInterval(() => {
+            console.log('trying reconnection');
+            if(!this._connected)
+            this._sock.connect(this._port, this._ip);
+        }, 3000);
+    }
+
+    remove_listeners(){
+
+    }
+
+    add_listeners(){
+
+    }
 
     parseResponse(buffer) {
-        console.log("buffer ", buffer.toString());
+        // console.log("buffer ", buffer.toString());
         if (buffer !== undefined) {
             if (buffer.slice(2, 11).toString() === 'Password:') {
                 // console.log('sending password');
@@ -77,15 +109,15 @@ export default class SSP200 {
             // mute status
             if(buffer.slice(0,3).toString() === 'Amt'){
                 this._current_state.muteStatus = Boolean(Number(buffer.slice(3,4).toString()));
-                console.log('mute status: ', this._current_state.muteStatus);
+                // console.log('mute status: ', this._current_state.muteStatus);
             }
             if(buffer.slice(0,3).toString() === 'Aud'){
                 this._current_state.input = Number(buffer.slice(3,4).toString());
-                console.log('current input: ', this._current_state.input);
+                // console.log('current input: ', this._current_state.input);
             }
             if(buffer.slice(0,5).toString() === 'In00 '){
                 this._current_state.signalDetected = Boolean(Number(buffer.slice(5,6).toString()));
-                console.log('signal detected: ', this._current_state.signalDetected);
+                // console.log('signal detected: ', this._current_state.signalDetected);
             }
             if(buffer.slice(0,3).toString() === 'Vol'){
                 var vol = (buffer.slice(4,5).toString() === '\r') ? 
@@ -94,7 +126,7 @@ export default class SSP200 {
                 if (buffer.slice(5,6).toString() === '0')
                     vol = '100'
                 this._current_state.volumeLevel = Number(vol);
-                console.log('volume: ', this._current_state.volumeLevel);
+                // console.log('volume: ', this._current_state.volumeLevel);
             }
 
         }

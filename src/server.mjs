@@ -43,67 +43,70 @@ const app = express();
 const setup = () => {
     console.time('setup started in ');
     // console.log('Starting setup');
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
-    const serviceManager = new ODCServiceManager();
-    let config = await fs.readFile('config/OpenDController.server.ini', 'utf-8').then((cfgTxt) => {
-        return parse(cfgTxt, { dataSections: ['MappingProjectors'] });
-    });
-    //*** NOT USED
-    // const mdns = new Bonjour()
-    // mdns.publish({ name: 'opendDControllerServer', subtypes: ['config', 'api'], txt: 'config avialable at /config', type: 'http', port: 3000, host: config.DevicesService.ip })
-    //*** */
-    if(config.HdmiMatrix.activate){
-        serviceManager.addService('SwitcherService', new ODCSerialService(config.HdmiMatrix.baudRate, config.HdmiMatrix.path));
-    }
+        const serviceManager = new ODCServiceManager();
+        let config = await fs.readFile('/home/odc/OpenDController/config/OpenDController.server.ini', 'utf-8').then(async (cfgTxt) => {
 
-        const projectorService = new Projectors(config.MappingProjectors);
-        const soundMixerService = new SSP200(config.SoundMixer.pass, config.SoundMixer.ip, config.SoundMixer.port, config.SoundMixer.heartbeat)
-        console.log(config.ArtNetDevice.ip);
-        const lightService = new ArtnetLight(config.ArtNetDevice.ip, 
-            config.ArtNetDevice.port);
-        serviceManager.addService('ProjectorsService', projectorService);
-        serviceManager.addService('SoundMixerService', soundMixerService);
-        serviceManager.addService('LightService', lightService);
+            let config = parse(cfgTxt, { dataSections: ['MappingProjectors'] });
+            //*** NOT USED
+            // const mdns = new Bonjour()
+            // mdns.publish({ name: 'opendDControllerServer', subtypes: ['config', 'api'], txt: 'config avialable at /config', type: 'http', port: 3000, host: config.DevicesService.ip })
+            //*** */
+            if (config.HdmiMatrix.activate) {
+                serviceManager.addService('SwitcherService', new ODCSerialService(config.HdmiMatrix.baudRate, config.HdmiMatrixRaspConfig.path));
+            }
+
+            const projectorService = new Projectors(config.MappingProjectors);
+            const soundMixerService = new SSP200(config.SoundMixer.pass, config.SoundMixer.ip, config.SoundMixer.port, config.SoundMixer.heartbeat)
+            console.log(config.ArtNetDevice.ip);
+            const lightService = new ArtnetLight(config.ArtNetDevice.ip,
+                config.ArtNetDevice.port);
+            serviceManager.addService('ProjectorsService', projectorService);
+            serviceManager.addService('SoundMixerService', soundMixerService);
+            serviceManager.addService('LightService', lightService);
 
 
-    
-    app.set('config', config);
-    app.set('ServiceManager', serviceManager);
 
-    app.use('/config', cors(), ConfigRoute);
-    app.use('/projector/:projector',
-        (req, res, next) => {
-            req.app.set('projector', req.params.projector);
-            next();
-    },cors(),ProjectorRoute);
-    app.use('/audio-mixer', cors(), SoundMixerRoute);
-    app.use('/video-switcher',(req, res, next) => {
-        if(config.HdmiMatrix.activate){
-            next();
-        }else{
-            let r = { from: 'VideoSwitcherRoute', 
-                        command: 'switch/video', 
-                        value: config.HdmiMatrix.activate, 
-                        device:'purelink HDMI UHDS-41R Switcher', 
+            app.set('config', config);
+            app.set('ServiceManager', serviceManager);
+
+            app.use('/config', cors(), ConfigRoute);
+            app.use('/projector/:projector',
+                (req, res, next) => {
+                    req.app.set('projector', req.params.projector);
+                    next();
+                }, cors(), ProjectorRoute);
+            app.use('/audio-mixer', cors(), SoundMixerRoute);
+            app.use('/video-switcher', (req, res, next) => {
+                if (config.HdmiMatrix.activate) {
+                    next();
+                } else {
+                    let r = {
+                        from: 'VideoSwitcherRoute',
+                        command: 'switch/video',
+                        value: config.HdmiMatrix.activate,
+                        device: 'purelink HDMI UHDS-41R Switcher',
                         done: false,
-                        response: 'Desactivated by your administrator' };
-            res.status(200).json(r);
-        }
-    }, cors(), VideoSwitcherRoute);
-    app.use('/light', cors(), LightsRoute);
-    if(!config.misc.prod){
-        app.use("/styles/css/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/")));
-        app.use("/js/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/js/")));
-        app.get('/', (req, res, next) => {
-            return res.sendFile(path.join(__dirname, 'static', 'dev.html'))
+                        response: 'Desactivated by your administrator'
+                    };
+                    res.status(200).json(r);
+                }
+            }, cors(), VideoSwitcherRoute);
+            app.use('/light', cors(), LightsRoute);
+            if (!config.misc.prod) {
+                app.use("/styles/css/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css/")));
+                app.use("/js/bootstrap/", express.static(path.join(__dirname, "../node_modules/bootstrap/dist/js/")));
+                app.get('/', (req, res, next) => {
+                    return res.sendFile(path.join(__dirname, 'static', 'dev.html'))
+                });
+            }
+            resolve(config);
         });
-    }
-    resolve(config);
-});
-} 
+    });
+}
 
-setup().then( ((config) => {
+setup().then(((config) => {
     console.timeEnd('setup started in ');
     app.listen(config.DevicesService.port, config.DevicesService.ip, () => {
         console.log('listening on http://' + config.DevicesService.ip + ':' + config.DevicesService.port);
