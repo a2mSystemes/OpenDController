@@ -60,7 +60,7 @@ export default class SSP200 {
 
 
     parseResponse(buffer) {
-        // console.log(buffer.toString());
+        console.log("buffer ", buffer.toString());
         if (buffer !== undefined) {
             if (buffer.slice(2, 11).toString() === 'Password:') {
                 // console.log('sending password');
@@ -68,18 +68,24 @@ export default class SSP200 {
                 let buff = Buffer.from([0x1b]) + Buffer.from("3CV\n\r");
                 this._sock.write(buff);
             }
+            if (buffer.toString() === 'Password:') {
+                // console.log('sending password');
+                this._sock.write(Buffer.from(this._pass + "\n"));
+                let buff = Buffer.from([0x1b]) + Buffer.from("3CV\n\r");
+                this._sock.write(buff);
+            }
             // mute status
             if(buffer.slice(0,3).toString() === 'Amt'){
                 this._current_state.muteStatus = Boolean(Number(buffer.slice(3,4).toString()));
-                // console.log('mute status: ', this._current_state.muteStatus);
+                console.log('mute status: ', this._current_state.muteStatus);
             }
             if(buffer.slice(0,3).toString() === 'Aud'){
                 this._current_state.input = Number(buffer.slice(3,4).toString());
-                // console.log('current input: ', this._current_state.input);
+                console.log('current input: ', this._current_state.input);
             }
             if(buffer.slice(0,5).toString() === 'In00 '){
                 this._current_state.signalDetected = Boolean(Number(buffer.slice(5,6).toString()));
-                // console.log('signal detected: ', this._current_state.signalDetected);
+                console.log('signal detected: ', this._current_state.signalDetected);
             }
             if(buffer.slice(0,3).toString() === 'Vol'){
                 var vol = (buffer.slice(4,5).toString() === '\r') ? 
@@ -88,7 +94,7 @@ export default class SSP200 {
                 if (buffer.slice(5,6).toString() === '0')
                     vol = '100'
                 this._current_state.volumeLevel = Number(vol);
-                // console.log('volume: ', this._current_state.volumeLevel);
+                console.log('volume: ', this._current_state.volumeLevel);
             }
 
         }
@@ -101,7 +107,7 @@ export default class SSP200 {
 
     update() {
         this._sock.write(Buffer.from('$\n'));
-        this._sock.write(Buffer.from('V'));
+        this._sock.write(Buffer.from('V\n'));
         this._sock.write(Buffer.from('Z\n'));
         this._sock.write(Buffer.from([0x1b]) + Buffer.from('0LS\n'));
         // source format

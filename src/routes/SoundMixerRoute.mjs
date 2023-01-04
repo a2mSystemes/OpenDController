@@ -30,7 +30,7 @@ router.get('/input/select/:input', cors(), (req, res) => {
     let r = { from: 'SoundMixerRoute', command: 'mute', value: `${input}`, device: 'Extron® SSP 200', done: false };
     service.setInput(input).then((state) => {
         r.response = state;
-        res.done = true;
+        r.done = true;
         res.status(200).json(r);
     }).catch(err =>{
         r.response = err;
