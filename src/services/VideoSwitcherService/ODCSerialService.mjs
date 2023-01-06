@@ -71,7 +71,7 @@ export default class ODCSerialService {
         this._reader = null;
         this._handleSerial.close();
         clearInterval(this._interval);
-        console.log("serial port closed");
+        // console.log("serial port closed");
     }
 
     observe() {
@@ -147,7 +147,7 @@ export default class ODCSerialService {
                 }
                 return new Promise((r) => {
                     const service = new ODCSerialService(baudRate, path);
-                    console.log(service);
+                    // console.log(service);
                     r(service);
                 }); 
             });

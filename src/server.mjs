@@ -59,7 +59,7 @@ const setup = () => {
 
             const projectorService = new Projectors(config.MappingProjectors);
             const soundMixerService = new SSP200(config.SoundMixer.pass, config.SoundMixer.ip, config.SoundMixer.port, config.SoundMixer.heartbeat)
-            console.log(config.ArtNetDevice.ip);
+            // console.log(config.ArtNetDevice.ip);
             const lightService = new ArtnetLight(config.ArtNetDevice.ip,
                 config.ArtNetDevice.port);
             serviceManager.addService('ProjectorsService', projectorService);

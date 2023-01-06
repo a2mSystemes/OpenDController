@@ -55,7 +55,7 @@ router.get('/volume/mute', cors(), (req, res) => {
 });
 
 router.get('/volume/unmute', cors(), (req, res) => {
-    let r = { from: 'SoundMixerRoute', command: 'mute', value: true, device: 'Extron® SSP 200', done: false };
+    let r = { from: 'SoundMixerRoute', command: 'unmute', value: true, device: 'Extron® SSP 200', done: false };
     service.unmute().then((state) => {
         r.response = state;
         r.done = true;

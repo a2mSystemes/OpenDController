@@ -109,7 +109,7 @@ export default class SSP200 {
             // mute status
             if(buffer.slice(0,3).toString() === 'Amt'){
                 this._current_state.muteStatus = Boolean(Number(buffer.slice(3,4).toString()));
-                // console.log('mute status: ', this._current_state.muteStatus);
+                console.log('mute status: ', this._current_state.muteStatus);
             }
             if(buffer.slice(0,3).toString() === 'Aud'){
                 this._current_state.input = Number(buffer.slice(3,4).toString());
@@ -158,7 +158,6 @@ export default class SSP200 {
     }
 
     setVolume(vol) {
-
         if (isNaN(Number(vol)))
             return new Promise((resolve, reject) => reject({error: vol + ' is not a number !!!!'}));
         vol = Number(vol);
@@ -179,11 +178,13 @@ export default class SSP200 {
     }
 
     mute() {
+        // console.log("Mute");
         this._sock.write(Buffer.from("1Z\n"));
         return this.state();
     }
 
     unmute() {
+        // console.log("UnMute");
         this._sock.write(Buffer.from("0Z\n"));
         return this.state();
     }
